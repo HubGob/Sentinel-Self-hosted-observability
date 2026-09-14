@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from sentinel.database import async_session
 from sentinel.models import Alert
@@ -13,7 +13,7 @@ async def list_alerts(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     service_id: str | None = None,
-):
+) -> AlertListResponse:
     async with async_session() as session:
         query = select(Alert).order_by(Alert.triggered_at.desc()).limit(limit).offset(offset)
         count_query = select(func.count(Alert.id))

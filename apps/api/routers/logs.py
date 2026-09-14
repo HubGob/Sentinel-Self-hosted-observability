@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from sentinel.database import async_session
 from sentinel.models import Log
@@ -14,7 +14,7 @@ async def list_logs(
     offset: int = Query(0, ge=0),
     service_id: str | None = None,
     level: str | None = None,
-):
+) -> LogListResponse:
     async with async_session() as session:
         query = select(Log).order_by(Log.timestamp.desc()).limit(limit).offset(offset)
         count_query = select(func.count(Log.id))

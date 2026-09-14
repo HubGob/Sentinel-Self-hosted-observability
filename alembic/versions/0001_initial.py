@@ -1,19 +1,20 @@
 """initial
 
 Revision ID: 0001_initial
-Revises: 
+Revises:
 Create Date: 2024-01-01 00:00:00.000000
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
+
 revision: str = "0001_initial"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -49,7 +50,11 @@ def upgrade() -> None:
         sa.Column("id", sa.String(36), primary_key=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("service_name", sa.String(255), nullable=True),
-        sa.Column("rule_type", sa.Enum("error_count", "error_rate", name="alertruletype"), nullable=False),
+        sa.Column(
+            "rule_type",
+            sa.Enum("error_count", "error_rate", name="alertruletype"),
+            nullable=False,
+        ),
         sa.Column("threshold", sa.Float, nullable=False),
         sa.Column("window_seconds", sa.Integer, nullable=False, default=60),
         sa.Column("enabled", sa.Boolean, nullable=False, default=True),

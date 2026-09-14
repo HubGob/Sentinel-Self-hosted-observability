@@ -1,5 +1,5 @@
-import json
 import pytest
+
 from sentinel.queue.redis_queue import RedisQueue
 
 

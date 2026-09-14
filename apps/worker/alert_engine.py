@@ -1,10 +1,11 @@
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from sentinel.database import async_session
-from sentinel.models import Alert, AlertRule, AlertRuleType, Log
+from sentinel.models import Alert, AlertRule, AlertRuleType, Log, Service
 
 logger = logging.getLogger(__name__)
 
@@ -17,19 +18,17 @@ def evaluate_error_rate(rate: float, threshold: float) -> bool:
     return rate > threshold
 
 
-async def evaluate_rules():
+async def evaluate_rules() -> None:
     """Evaluate all enabled alert rules."""
     async with async_session() as session:
-        result = await session.execute(
-            select(AlertRule).where(AlertRule.enabled == True)
-        )
+        result = await session.execute(select(AlertRule).where(AlertRule.enabled))
         rules = result.scalars().all()
 
         for rule in rules:
             await evaluate_rule(session, rule)
 
 
-async def evaluate_rule(session, rule: AlertRule):
+async def evaluate_rule(session: AsyncSession, rule: AlertRule) -> None:
     now = datetime.utcnow()
     window_start = now - timedelta(seconds=rule.window_seconds)
 
@@ -39,7 +38,6 @@ async def evaluate_rule(session, rule: AlertRule):
     )
 
     if rule.service_name:
-        from sentinel.models import Service
         service_result = await session.execute(
             select(Service.id).where(Service.name == rule.service_name)
         )
@@ -60,7 +58,6 @@ async def evaluate_rule(session, rule: AlertRule):
         return
 
     if triggered:
-        from sentinel.models import Service
         service_query = select(Service.id)
         if rule.service_name:
             service_query = service_query.where(Service.name == rule.service_name)
@@ -68,7 +65,7 @@ async def evaluate_rule(session, rule: AlertRule):
         service_id = service_result.scalar_one_or_none()
 
         alert = Alert(
-            rule_id=rule.rule_id if hasattr(rule, 'rule_id') else rule.id,
+            rule_id=rule.id,
             service_id=service_id or "",
             value=float(count),
             message=f"Alert: {rule.name} triggered (value: {count})",

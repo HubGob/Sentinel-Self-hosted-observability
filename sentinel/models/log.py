@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import String, DateTime, Text, Integer, ForeignKey, Index
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from sentinel.database import Base
@@ -11,7 +11,9 @@ class Log(Base):
     __tablename__ = "logs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
-    service_id: Mapped[str] = mapped_column(String(36), ForeignKey("services.id"), nullable=False, index=True)
+    service_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("services.id"), nullable=False, index=True
+    )
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     level: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     message: Mapped[str] = mapped_column(Text, nullable=False)
