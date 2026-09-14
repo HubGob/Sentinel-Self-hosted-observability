@@ -8,6 +8,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { path: '/', label: 'Services' },
     { path: '/logs', label: 'Logs' },
     { path: '/alerts', label: 'Alerts' },
+    { path: '/status', label: 'Status page' },
   ]
 
   return (
