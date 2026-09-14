@@ -1,8 +1,8 @@
 import asyncio
-import json
 import logging
 import re
 from datetime import datetime
+from typing import Any
 
 import httpx
 
@@ -19,7 +19,7 @@ LOG_PATTERN = re.compile(
 )
 
 
-def parse_docker_log(line: str, container_name: str, container_id: str) -> dict:
+def parse_docker_log(line: str, container_name: str, container_id: str) -> dict[str, Any]:
     match = LOG_PATTERN.match(line.strip())
     if match:
         groups = match.groupdict()
@@ -49,7 +49,7 @@ def parse_docker_log(line: str, container_name: str, container_id: str) -> dict:
     }
 
 
-async def send_to_api(log_entry: dict):
+async def send_to_api(log_entry: dict[str, Any]) -> None:
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
@@ -61,8 +61,9 @@ async def send_to_api(log_entry: dict):
             logger.error(f"Failed to send log: {e}")
 
 
-async def collect_logs():
+async def collect_logs() -> None:
     import docker
+
     client = docker.from_env()
     containers = client.containers.list()
 

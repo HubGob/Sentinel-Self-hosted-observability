@@ -1,22 +1,25 @@
 import asyncio
 import logging
 from datetime import datetime
+from typing import Any
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from apps.worker.processors import normalize_log
 from sentinel.config import Settings
 from sentinel.database import async_session
-from sentinel.models import Service, Log
+from sentinel.models import Log, Service
 from sentinel.queue.redis_queue import RedisQueue
-from sentinel.worker.processors import normalize_log
 
 settings = Settings()
 logger = logging.getLogger(__name__)
 
 
-async def get_or_create_service(session, name: str) -> Service:
-    from sqlalchemy import select
+async def get_or_create_service(session: AsyncSession, name: str) -> Service:
     result = await session.execute(select(Service).where(Service.name == name))
-    service = result.scalar_one_or_none()
-    if not service:
+    service: Service | None = result.scalar_one_or_none()
+    if service is None:
         service = Service(name=name)
         session.add(service)
         await session.flush()
@@ -24,7 +27,7 @@ async def get_or_create_service(session, name: str) -> Service:
     return service
 
 
-async def process_log(raw_log: dict) -> None:
+async def process_log(raw_log: dict[str, Any]) -> None:
     normalized = normalize_log(raw_log)
     async with async_session() as session:
         service = await get_or_create_service(session, normalized["service_name"])
@@ -42,7 +45,7 @@ async def process_log(raw_log: dict) -> None:
         await session.commit()
 
 
-async def run_worker():
+async def run_worker() -> None:
     queue = RedisQueue()
     logger.info("Worker started")
     while True:

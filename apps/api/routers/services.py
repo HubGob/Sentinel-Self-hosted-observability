@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from sentinel.database import async_session
 from sentinel.models import Service
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/v1", tags=["services"])
 
 
 @router.get("/services", response_model=ServiceListResponse)
-async def list_services():
+async def list_services() -> ServiceListResponse:
     async with async_session() as session:
         result = await session.execute(select(Service).order_by(Service.name))
         services = result.scalars().all()

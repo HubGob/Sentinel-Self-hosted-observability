@@ -1,14 +1,15 @@
+import enum
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Enum as SAEnum
+from sqlalchemy import Boolean, DateTime, Float, Integer, String
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
-import enum
 
 from sentinel.database import Base
 
 
-class AlertRuleType(str, enum.Enum):
+class AlertRuleType(enum.StrEnum):
     ERROR_COUNT = "error_count"
     ERROR_RATE = "error_rate"
 

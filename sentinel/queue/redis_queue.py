@@ -1,4 +1,6 @@
 import json
+from typing import Any
+
 import redis
 
 from sentinel.config import Settings
@@ -11,13 +13,14 @@ class RedisQueue:
         self.client = redis.from_url(settings.redis_url, decode_responses=True)
         self.queue_name = queue_name
 
-    def enqueue(self, item: dict) -> None:
+    def enqueue(self, item: dict[str, Any]) -> None:
         self.client.lpush(self.queue_name, json.dumps(item))
 
-    def dequeue(self, timeout: int = 5) -> dict | None:
+    def dequeue(self, timeout: int = 5) -> dict[str, Any] | None:
         result = self.client.brpop(self.queue_name, timeout=timeout)
         if result:
-            return json.loads(result[1])
+            item: dict[str, Any] = json.loads(result[1])
+            return item
         return None
 
     def flush(self) -> None:
