@@ -6,6 +6,7 @@ from apps.api.routers import (
     ingest_router,
     logs_router,
     services_router,
+    uptime_router,
 )
 
 app = FastAPI(title="Sentinel API", version="0.1.0")
@@ -14,3 +15,4 @@ app.include_router(ingest_router)
 app.include_router(logs_router)
 app.include_router(services_router)
 app.include_router(alerts_router)
+app.include_router(uptime_router)
