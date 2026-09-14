@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   test:
@@ -52,6 +52,12 @@ jobs:
 
       - name: Run mypy
         run: uv run mypy sentinel/ apps/
+
+      - name: Apply migrations
+        run: uv run alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+psycopg://sentinel:sentinel@localhost:5432/sentinel
+          REDIS_URL: redis://localhost:6379/0
 
       - name: Run tests
         run: uv run pytest --cov=sentinel --cov=apps --cov-report=xml
