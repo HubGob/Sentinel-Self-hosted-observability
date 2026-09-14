@@ -1,8 +1,11 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ReactNode } from 'react'
+import { useAuth } from '../auth/AuthContext'
 
 export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
 
   const navItems = [
     { path: '/', label: 'Services' },
@@ -10,6 +13,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     { path: '/alerts', label: 'Alerts' },
     { path: '/status', label: 'Status page' },
   ]
+
+  function onLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -19,7 +27,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">Sentinel</h1>
             </div>
-            <div className="flex space-x-8">
+            <div className="flex items-center space-x-8">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -33,6 +41,13 @@ export default function Layout({ children }: { children: ReactNode }) {
                   {item.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={onLogout}
+                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+              >
+                Log out
+              </button>
             </div>
           </div>
         </div>
