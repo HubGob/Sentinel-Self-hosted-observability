@@ -1,5 +1,6 @@
 from datetime import datetime
-from sentinel.worker.processors import normalize_log
+
+from apps.worker.processors import normalize_log
 
 
 def test_normalize_log():
