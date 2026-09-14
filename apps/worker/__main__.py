@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from sentinel.worker.worker import run_worker
+
+from apps.worker.worker import run_worker
 
 logging.basicConfig(level=logging.INFO)
 

@@ -1,5 +1,4 @@
-import pytest
-from sentinel.apps.collector.collector import parse_docker_log
+from apps.collector.collector import parse_docker_log
 
 
 def test_parse_docker_log():

@@ -1,5 +1,4 @@
-import pytest
-from sentinel.worker.alert_engine import evaluate_error_count, evaluate_error_rate
+from apps.worker.alert_engine import evaluate_error_count, evaluate_error_rate
 
 
 def test_evaluate_error_count_below_threshold():
