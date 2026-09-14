@@ -80,3 +80,4 @@ async def test_status_reports_uptime_windows_and_latest_state():
     assert status["uptime_24h"] == 50.0
     assert status["uptime_7d"] == 50.0
     assert status["uptime_30d"] == 50.0
+    assert [point["status"] for point in status["recent"]] == ["up", "down"]

@@ -29,6 +29,12 @@ class ReportOut(BaseModel):
     incident_closed: bool = False
 
 
+class CheckPoint(BaseModel):
+    checked_at: datetime
+    status: str
+    latency_ms: int | None
+
+
 class ServiceStatus(BaseModel):
     service: str
     url: str | None
@@ -38,6 +44,7 @@ class ServiceStatus(BaseModel):
     uptime_7d: float
     uptime_30d: float
     last_checked_at: datetime | None
+    recent: list[CheckPoint]
 
 
 class StatusResponse(BaseModel):
@@ -171,6 +178,14 @@ async def get_status() -> StatusResponse:
                     uptime_7d=uptime_percentage(checks, now, 7 * DAY),
                     uptime_30d=uptime_percentage(checks, now, 30 * DAY),
                     last_checked_at=last.checked_at if last else None,
+                    recent=[
+                        CheckPoint(
+                            checked_at=check.checked_at,
+                            status=check.status,
+                            latency_ms=check.latency_ms,
+                        )
+                        for check in reversed(checks[:30])
+                    ],
                 )
             )
     return StatusResponse(services=out)
