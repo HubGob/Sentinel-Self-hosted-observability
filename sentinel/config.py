@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     worker_poll_interval: float = 1.0
     worker_batch_size: int = 100
     log_level: str = "INFO"
+    discord_webhook_url: str | None = None
 
 
 settings = Settings()
