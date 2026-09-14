@@ -1,4 +1,5 @@
 from apps.api.routers.alerts import router as alerts_router
+from apps.api.routers.auth import router as auth_router
 from apps.api.routers.health import router as health_router
 from apps.api.routers.ingest import router as ingest_router
 from apps.api.routers.logs import router as logs_router
@@ -7,6 +8,7 @@ from apps.api.routers.uptime import router as uptime_router
 
 __all__ = [
     "alerts_router",
+    "auth_router",
     "health_router",
     "ingest_router",
     "logs_router",

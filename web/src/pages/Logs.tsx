@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
+import EmptyState from '../components/EmptyState'
 
 const LEVEL_COLORS: Record<string, string> = {
   DEBUG: 'bg-gray-100 text-gray-800',
@@ -15,24 +16,46 @@ export default function Logs() {
   const serviceId = searchParams.get('service_id') || undefined
   const level = searchParams.get('level') || undefined
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['logs', serviceId, level],
     queryFn: () => api.getLogs({ service_id: serviceId, level }),
   })
 
-  if (isLoading) return <div className="text-center py-8">Loading...</div>
+  const logs = data?.logs ?? []
+  const filtered = serviceId !== undefined || level !== undefined
 
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Logs</h2>
       <div className="bg-white shadow overflow-hidden rounded-md">
+        {isLoading && <EmptyState title="Loading logs…" />}
+        {isError && (
+          <EmptyState title="Could not load logs." hint="Check that the API is reachable." />
+        )}
+        {!isLoading && !isError && logs.length === 0 && (
+          <EmptyState
+            title={filtered ? 'No logs match this filter.' : 'No logs yet.'}
+            hint={
+              filtered ? (
+                'Clear the filter to see everything.'
+              ) : (
+                <>
+                  Logs appear here once something POSTs to{' '}
+                  <code className="font-mono">/api/v1/ingest</code>.
+                </>
+              )
+            }
+          />
+        )}
         <ul className="divide-y divide-gray-200">
-          {data?.logs.map((log) => (
+          {logs.map((log) => (
             <li key={log.id} className="px-6 py-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${LEVEL_COLORS[log.level] || ''}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-medium rounded ${LEVEL_COLORS[log.level] || ''}`}
+                    >
                       {log.level}
                     </span>
                     <span className="text-sm text-gray-500">

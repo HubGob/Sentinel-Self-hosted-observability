@@ -1,20 +1,31 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
+import EmptyState from '../components/EmptyState'
 
 export default function Alerts() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['alerts'],
     queryFn: () => api.getAlerts(),
   })
 
-  if (isLoading) return <div className="text-center py-8">Loading...</div>
+  const alerts = data?.alerts ?? []
 
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Alerts</h2>
       <div className="bg-white shadow overflow-hidden rounded-md">
+        {isLoading && <EmptyState title="Loading alerts…" />}
+        {isError && (
+          <EmptyState title="Could not load alerts." hint="Check that the API is reachable." />
+        )}
+        {!isLoading && !isError && alerts.length === 0 && (
+          <EmptyState
+            title="No alerts have fired."
+            hint="Alerts appear here when a rule matches incoming logs."
+          />
+        )}
         <ul className="divide-y divide-gray-200">
-          {data?.alerts.map((alert) => (
+          {alerts.map((alert) => (
             <li key={alert.id} className="px-6 py-4">
               <div className="flex items-start justify-between">
                 <div>
