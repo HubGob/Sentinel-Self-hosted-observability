@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 
+from apps.api.dependencies import require_user
 from sentinel.database import async_session
 from sentinel.models import Alert
 from sentinel.schemas.alert import AlertListResponse, AlertResponse
 
-router = APIRouter(prefix="/api/v1", tags=["alerts"])
+router = APIRouter(prefix="/api/v1", tags=["alerts"], dependencies=[Depends(require_user)])
 
 
 @router.get("/alerts", response_model=AlertListResponse)

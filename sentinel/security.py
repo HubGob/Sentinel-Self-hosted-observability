@@ -24,6 +24,10 @@ from sentinel.config import settings
 
 TokenType = Literal["access", "refresh"]
 
+# NIST SP 800-63B sets 8 as the floor for a user-chosen password. Length is the
+# only rule enforced; composition rules push people toward predictable patterns.
+MIN_PASSWORD_LENGTH = 8
+
 
 class InvalidTokenError(Exception):
     """A token was missing, malformed, expired, forged, or of the wrong type."""
