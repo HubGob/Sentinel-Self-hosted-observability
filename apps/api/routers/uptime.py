@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from sentinel.database import async_session
 from sentinel.models import Incident, Service, UptimeCheck
+from sentinel.notify import notify_incident
 
 router = APIRouter(prefix="/api/v1", tags=["uptime"])
 
@@ -135,6 +136,8 @@ async def report(body: ReportIn) -> ReportOut:
                 closed = True
 
         await session.commit()
+    if opened or closed:
+        await notify_incident(body.service_name, opened=opened, url=body.url)
     return ReportOut(accepted=1, incident_opened=opened, incident_closed=closed)
 
 
